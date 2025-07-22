@@ -33,34 +33,58 @@ export default function MapPage() {
         })
     }
 
-    // Calcular comunas visibles basado en filtros
-    const calcularComunasVisibles = () => {
-        const comunas = [
-            { name: "Santiago", idc: 0.75, region: "Metropolitana" },
-            { name: "Providencia", idc: 0.82, region: "Metropolitana" },
-            { name: "Las Condes", idc: 0.88, region: "Metropolitana" },
-            { name: "Maipú", idc: 0.65, region: "Metropolitana" },
-            { name: "La Florida", idc: 0.58, region: "Metropolitana" },
-            { name: "Puente Alto", idc: 0.52, region: "Metropolitana" }
-        ]
+    // Calcular elementos visibles basado en filtros
+    const calcularElementosVisibles = () => {
+        if (filters.comuna === "La Florida") {
+            // Cuadrantes de La Florida
+            const cuadrantes = [
+                { idc: 0.71, name: "Manzana Centro Comercial" },
+                { idc: 0.65, name: "Manzana Residencial Norte" },
+                { idc: 0.61, name: "Manzana Sur Industrial" },
+                { idc: 0.68, name: "Manzana Este Universitaria" },
+                { idc: 0.52, name: "Manzana Oeste Residencial" },
+                { idc: 0.45, name: "Manzana Noroeste" },
+                { idc: 0.58, name: "Manzana Sureste" },
+                { idc: 0.63, name: "Manzana Central" }
+            ]
 
-        return comunas.filter(comuna => {
-            const idcLevel = getIDCLevel(comuna.idc)
-            const showByIDC =
-                (idcLevel === 'alto' && filters.showAlto) ||
-                (idcLevel === 'medio' && filters.showMedio) ||
-                (idcLevel === 'bajo' && filters.showBajo)
+            return cuadrantes.filter(cuadrante => {
+                const idcLevel = getIDCLevel(cuadrante.idc)
+                return (
+                    (idcLevel === 'alto' && filters.showAlto) ||
+                    (idcLevel === 'medio' && filters.showMedio) ||
+                    (idcLevel === 'bajo' && filters.showBajo)
+                )
+            }).length
+        } else {
+            // Comunas
+            const comunas = [
+                { name: "Santiago", idc: 0.75, region: "Metropolitana" },
+                { name: "Providencia", idc: 0.82, region: "Metropolitana" },
+                { name: "Las Condes", idc: 0.88, region: "Metropolitana" },
+                { name: "Maipú", idc: 0.65, region: "Metropolitana" },
+                { name: "La Florida", idc: 0.58, region: "Metropolitana" },
+                { name: "Puente Alto", idc: 0.52, region: "Metropolitana" }
+            ]
 
-            const showByRegion = filters.region === "all" || comunas.some(c => c.region === filters.region)
-            const showByComuna = filters.comuna === "all" || comunas.some(c => c.name === filters.comuna)
+            return comunas.filter(comuna => {
+                const idcLevel = getIDCLevel(comuna.idc)
+                const showByIDC =
+                    (idcLevel === 'alto' && filters.showAlto) ||
+                    (idcLevel === 'medio' && filters.showMedio) ||
+                    (idcLevel === 'bajo' && filters.showBajo)
 
-            return showByIDC && showByRegion && showByComuna
-        }).length
+                const showByRegion = filters.region === "all" || comunas.some(c => c.region === filters.region)
+                const showByComuna = filters.comuna === "all" || comunas.some(c => c.name === filters.comuna)
+
+                return showByIDC && showByRegion && showByComuna
+            }).length
+        }
     }
 
     const getIDCLevel = (idc: number) => {
-        if (idc >= 0.8) return "alto"
-        if (idc >= 0.6) return "medio"
+        if (idc >= 0.60) return "alto"
+        if (idc >= 0.50) return "medio"
         return "bajo"
     }
     return (
@@ -92,8 +116,10 @@ export default function MapPage() {
                             <CardContent className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="text-center">
-                                        <div className="text-2xl font-bold text-gray-900">{calcularComunasVisibles()}</div>
-                                        <div className="text-sm text-gray-600">Comunas visibles</div>
+                                        <div className="text-2xl font-bold text-gray-900">{calcularElementosVisibles()}</div>
+                                        <div className="text-sm text-gray-600">
+                                            {filters.comuna === "La Florida" ? "Cuadrantes visibles" : "Comunas visibles"}
+                                        </div>
                                     </div>
                                     <div className="text-center">
                                         <div className="text-2xl font-bold text-gray-900">0.71</div>
@@ -120,7 +146,7 @@ export default function MapPage() {
                                 {/* Filtros por IDC */}
                                 <div>
                                     <label className="text-sm font-medium text-gray-700 block mb-2">
-                                        Rango de IDC
+                                        Rangos BHT
                                     </label>
                                     <div className="space-y-2">
                                         <div className="flex items-center">
@@ -131,7 +157,7 @@ export default function MapPage() {
                                                 checked={filters.showAlto}
                                                 onChange={(e) => handleFilterChange('showAlto', e.target.checked)}
                                             />
-                                            <label htmlFor="alto" className="text-sm text-gray-700">Alto (0.8-1.0)</label>
+                                            <label htmlFor="alto" className="text-sm text-gray-700">Alto (0.60-1.00)</label>
                                         </div>
                                         <div className="flex items-center">
                                             <input
@@ -141,7 +167,7 @@ export default function MapPage() {
                                                 checked={filters.showMedio}
                                                 onChange={(e) => handleFilterChange('showMedio', e.target.checked)}
                                             />
-                                            <label htmlFor="medio" className="text-sm text-gray-700">Medio (0.6-0.8)</label>
+                                            <label htmlFor="medio" className="text-sm text-gray-700">Medio (0.50-0.60)</label>
                                         </div>
                                         <div className="flex items-center">
                                             <input
@@ -151,7 +177,7 @@ export default function MapPage() {
                                                 checked={filters.showBajo}
                                                 onChange={(e) => handleFilterChange('showBajo', e.target.checked)}
                                             />
-                                            <label htmlFor="bajo" className="text-sm text-gray-700">Bajo (0.0-0.6)</label>
+                                            <label htmlFor="bajo" className="text-sm text-gray-700">Bajo (0.00-0.50)</label>
                                         </div>
                                     </div>
                                 </div>
@@ -211,7 +237,10 @@ export default function MapPage() {
                                 {/* Información de filtros activos */}
                                 <div className="pt-2">
                                     <div className="text-xs text-gray-600">
-                                        <p>Comunas visibles: <span className="font-semibold">{calcularComunasVisibles()}</span></p>
+                                        <p>
+                                            {filters.comuna === "La Florida" ? "Cuadrantes visibles" : "Comunas visibles"}:
+                                            <span className="font-semibold">{calcularElementosVisibles()}</span>
+                                        </p>
                                         <p>Filtros activos: <span className="font-semibold">
                                             {[
                                                 filters.showAlto && 'Alto',
@@ -247,8 +276,19 @@ export default function MapPage() {
                                     <p>Gris: IDC bajo (0.0-0.4)</p>
                                 </div>
                                 <p className="pt-2 text-xs">
-                                    Haz clic en los marcadores para ver más información sobre cada comuna.
+                                    {filters.comuna === "La Florida"
+                                        ? "Haz clic en los cuadrantes para ver información detallada de cada zona."
+                                        : "Haz clic en los marcadores para ver más información sobre cada comuna."
+                                    }
                                 </p>
+                                {filters.comuna === "La Florida" && (
+                                    <div className="pt-2 p-3 bg-orange-50 rounded border border-orange-200">
+                                        <p className="text-xs font-semibold text-orange-800 mb-1">Vista de Cuadrantes - La Florida</p>
+                                        <p className="text-xs text-orange-700">
+                                            Visualización detallada por manzanas y agrupaciones de manzanas en La Florida.
+                                        </p>
+                                    </div>
+                                )}
                             </CardContent>
                         </Card>
                     </div>
