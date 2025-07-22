@@ -212,7 +212,7 @@ export default function MapComponent({ className, filters }: MapComponentProps) 
                             [-70.56372245751284, -33.53235744523237],
                             [-70.56383265006735, -33.532311518835414]
                         ],
-                        idc: 0.38,
+                        idc: 0.51,
                         poblacion: 32500,
                         area: "0.26 km²"
                     }
@@ -333,8 +333,8 @@ export default function MapComponent({ className, filters }: MapComponentProps) 
                     if (!map.current.getCenter() ||
                         (map.current.getCenter().lng === -70.6483 && map.current.getCenter().lat === -33.4489)) {
                         map.current.flyTo({
-                            center: [-70.575, -33.525],
-                            zoom: 15
+                            center: [-70.568, -33.527],
+                            zoom: 14
                         })
                     }
                 }
